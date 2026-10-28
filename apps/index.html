@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ayush Tech Store | Powered by AyuPay</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            },
+            youpi: {
+              green: '#10b981',
+              amber: '#f59e0b',
+              purple: '#8b5cf6',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom scrollbar and smooth UI polish */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .badge-pulse {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+
+    /* The cart drawer covers the viewport; keep its closed state non-interactive
+       even when the Tailwind CDN stylesheet has not loaded on a mobile device. */
+    #cart-drawer {
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #cart-drawer.cart-drawer-open {
+      visibility: visible;
+      pointer-events: auto;
+    }
+    #product-grid button,
+    #cart-drawer button,
+    header button {
+      touch-action: manipulation;
+    }
+    .no-scrollbar { scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    @media (max-width: 640px) {
+      html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+      body { min-width: 320px; }
+
+      /* Keep the brand and actions on one row, with search on its own row. */
+      header > div:first-child {
+        height: auto;
+        min-height: 64px;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+      header > div:first-child > div:first-child { min-width: 0; gap: 8px; }
+      header > div:first-child > div:first-child > div:first-child {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+      }
+      header > div:first-child > div:first-child .text-xl { font-size: 17px; }
+      header > div:first-child > div:first-child .text-\[11px\] { display: none; }
+      header > div:first-child > div:first-child .text-\[10px\] { font-size: 8px; }
+      header > div:first-child > div:last-child { margin-left: auto; gap: 6px; }
+      header > div:first-child > div:last-child button { padding: 8px; }
+      header > div:first-child > .max-w-lg {
+        display: block;
+        order: 3;
+        flex: 0 0 100%;
+        max-width: none;
+      }
+      header > div:first-child > .max-w-lg input { min-height: 42px; }
+      header > div:nth-child(2) {
+        padding: 8px 12px;
+        gap: 7px;
+        overscroll-behavior-x: contain;
+      }
+
+      body > div:first-child { padding: 7px 12px; }
+      body > div:first-child > div { align-items: flex-start; }
+      #gateway-status { gap: 5px; }
+      #gateway-status span:last-child { display: none; }
+      body > div:first-child button { white-space: nowrap; }
+
+      body > section { padding: 14px 12px 4px; }
+      body > section > div { padding: 18px 15px; }
+      body > section h1 { font-size: clamp(25px, 7vw, 34px); line-height: 1.12; }
+      body > section h1 br { display: none; }
+      body > section .pt-2.flex button { width: 100%; justify-content: center; }
+      body > section .pt-4.flex { gap: 10px 14px; }
+
+      #products-section { padding: 22px 12px; }
+      #products-section > div:first-child { align-items: flex-start; }
+      #products-section > div:first-child p { max-width: 100%; line-height: 1.45; }
+      #products-section > div:first-child > div:last-child { align-self: flex-start; }
+      #product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      #product-grid > div { min-width: 0; padding: 9px; }
+      #product-grid h3 { font-size: 12px; line-height: 1.35; min-height: 32px; }
+      #product-grid .relative.h-36 { height: 118px; }
+      #product-grid .mt-4 { margin-top: 10px; }
+      #product-grid .text-xl { font-size: 16px; }
+      #product-grid .grid.grid-cols-2 { gap: 5px; }
+      #product-grid button { min-height: 40px; font-size: 10px; white-space: nowrap; }
+
+      /* The closed cart panel should align exactly to the phone viewport. */
+      #cart-drawer > div:last-child { padding-left: 0; width: 100%; }
+      #cart-panel { width: 100%; max-width: 100%; }
+      #orders-modal > div:nth-child(2),
+      #config-modal > div:nth-child(2),
+      #fallback-pay-modal > div:nth-child(2),
+      #success-modal > div:nth-child(2) { padding: 10px; }
+      #orders-container { padding: 12px; }
+      #toast-container { left: 12px; right: 12px; bottom: 12px; }
+      footer { padding-top: 28px; padding-bottom: 24px; }
+    }
+
+    @media (max-width: 360px) {
+      header > div:first-child > div:first-child .text-xl { font-size: 15px; }
+      header > div:first-child > div:first-child .text-\[10px\] { display: none; }
+      #product-grid { gap: 8px; }
+      #product-grid > div { padding: 7px; }
+      #product-grid .relative.h-36 { height: 104px; }
+      #product-grid .text-xl { font-size: 15px; }
+      #product-grid .text-\[11px\] { font-size: 9px; }
+      #product-grid .grid.grid-cols-2 { grid-template-columns: 1fr; }
+    }
+    @keyframes pulse-ring {
+      to {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+      }
+    }
+  </style>
+
+  <!-- Official AyuPay Universal Script Integration -->
+  <!-- Production AyuPay checkout and API endpoints -->
+  <script 
+    id="youpi-script" 
+    src="https://pay.ayupay.org/youpi.js" 
+    data-youpi-key="00000000-0000-0000-0000-000000000001" 
+    data-currency="INR"
+    data-api-url="https://api.ayupay.org"
+    data-portal-url="https://pay.ayupay.org">
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+  <!-- ================= TOP NOTICE BANNER ================= -->
+  <div class="bg-[#174ea6] text-white text-xs py-2 px-4 border-b border-blue-900/30">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          <i data-lucide="zap" class="w-3 h-3 mr-1 text-amber-400"></i> AyuPay INTEGRATED
+        </span>
+        <span class="hidden sm:inline text-slate-400">Merchant Gateway Core Active on Localhost</span>
+      </div>
+
+      <!-- Live Gateway Status Indicator -->
+      <div class="flex items-center gap-3">
+        <div id="gateway-status" class="flex items-center gap-1.5 font-medium text-[11px] text-amber-300">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <span>Connecting to Gateway (Port 7000)...</span>
+        </div>
+        <button onclick="toggleConfigModal(true)" class="text-xs text-indigo-300 hover:text-white underline transition">
+          Gateway Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STICKY HEADER ================= -->
+  <header class="sticky top-0 z-40 bg-[#2874f0] text-white border-b border-blue-700 shadow-sm transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="filterCategory('all')">
+        <img src="/ayupay-logo.png" alt="AyuPay logo" class="w-11 h-11 rounded-sm bg-white object-contain shadow-sm">
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xl font-extrabold tracking-tight text-white">Ayush<span class="text-yellow-300">Store</span></span>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/15 text-white border border-white/25">AyuPay</span>
+          </div>
+          <p class="text-[11px] font-medium text-blue-100 -mt-0.5">Next-Gen Electronics & UPI Hub</p>
+        </div>
+      </div>
+
+      <!-- Search Input -->
+      <div class="flex-1 max-w-lg hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input 
+            type="text" 
+            id="search-input" 
+            oninput="handleSearch(this.value)" 
+            placeholder="Search earbuds, smartwatches, power banks..." 
+            class="w-full bg-slate-100 border border-slate-200 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-500/10 rounded-xl pl-10 pr-4 py-2 text-sm transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Orders History Modal Trigger -->
+        <button 
+          onclick="toggleOrdersModal(true)" 
+          class="relative p-2.5 rounded-sm border border-white/30 hover:bg-white/10 text-white transition flex items-center gap-2 text-sm font-semibold"
+          title="Past Orders & UTR Records"
+        >
+          <i data-lucide="receipt" class="w-5 h-5"></i>
+          <span class="hidden lg:inline text-xs">Orders</span>
+          <span id="orders-count-badge" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-sky-600 text-white rounded-full text-[10px] items-center justify-center font-bold">0</span>
+        </button>
+
+        <!-- Cart Button -->
+        <button 
+          onclick="toggleCartDrawer(true)" 
+          class="relative p-2.5 rounded-sm bg-yellow-400 hover:bg-yellow-300 text-slate-900 shadow-sm transition flex items-center gap-2.5 text-sm font-semibold"
+        >
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-800"></i>
+          <span class="hidden sm:inline text-xs font-bold">Cart</span>
+          <span id="cart-counter" class="w-5 h-5 rounded-full bg-blue-700 text-white text-[11px] font-bold flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Pills Bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-slate-100">
+      <button onclick="filterCategory('all')" class="cat-pill active px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-sky-600 text-white shadow-sm shadow-sky-600/20" data-cat="all">All Tech</button>
+      <button onclick="filterCategory('Audio')" class="cat-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-slate-100 hover:bg-slate-200 text-slate-600" data-cat="Audio">Wireless Audio</button>
+      <button onclick="filterCategory('Wearables')" class="cat-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-slate-100 hover:bg-slate-200 text-slate-600" data-cat="Wearables">Smart Watches</button>
+      <button onclick="filterCategory('Power')" class="cat-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-slate-100 hover:bg-slate-200 text-slate-600" data-cat="Power">Power & GaN</button>
+      <button onclick="filterCategory('Gaming')" class="cat-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-slate-100 hover:bg-slate-200 text-slate-600" data-cat="Gaming">Gaming Gear</button>
+      <button onclick="filterCategory('Accessories')" class="cat-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-slate-100 hover:bg-slate-200 text-slate-600" data-cat="Accessories">Desk Accessories</button>
+    </div>
+  </header>
+
+  <!-- ================= HERO SHOWCASE ================= -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+    <div class="relative overflow-hidden rounded-sm bg-gradient-to-r from-[#2874f0] via-[#2874f0] to-[#1553b7] text-white p-6 sm:p-9 shadow-md border border-blue-700">
+      <!-- Glow effect -->
+      <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-sky-500/20 blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-indigo-500/20 blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold tracking-wide">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+            FESTIVE MEGA ELECTRONICS SALE
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            High Performance Gear. <br />
+            <span class="bg-gradient-to-r from-sky-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">Instant UPI Checkout.</span>
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base max-w-xl font-normal leading-relaxed">
+            Experience lightning-fast merchant payments handled directly by your local AyuPay engine. Instant QR generation, 12-digit UTR confirmation, and zero gateway latency.
+          </p>
+
+          <!-- Action buttons -->
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <button 
+              data-youpi-pay
+              data-order-id="AYUSH-FEAT-01"
+              data-amount="2499.00"
+              data-currency="INR"
+              onclick="handleQuickHeroPay(this)"
+              class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-bold text-sm text-white shadow-lg shadow-emerald-500/25 flex items-center gap-2.5 transition transform active:scale-95"
+            >
+              <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
+              <span>Quick Buy Hero Product (₹2,499)</span>
+            </button>
+            <button 
+              onclick="document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' })"
+              class="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white font-semibold text-sm transition"
+            >
+              Explore Catalog
+            </button>
+          </div>
+
+          <!-- Feature tags -->
+          <div class="pt-4 flex flex-wrap gap-4 text-xs text-slate-400 border-t border-slate-800/80">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+              <span>HMAC-SHA256 Webhook Verified</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="qr-code" class="w-4 h-4 text-sky-400"></i>
+              <span>Dynamic UPI Intent & QR</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="refresh-cw" class="w-4 h-4 text-amber-400"></i>
+              <span>Autonomous UTR Reconciler</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Featured Card -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="w-full max-w-sm rounded-sm bg-white border border-white/30 p-4 shadow-xl relative group">
+            <div class="relative h-48 w-full bg-white flex items-center justify-center overflow-hidden">
+              <i data-lucide="headphones" class="w-24 h-24 text-slate-300 group-hover:scale-110 transition duration-500"></i>
+              <img src="https://images.unsplash.com/photo-1640901821270-6e9c47fbdc07?auto=format&fit=crop&w=800&q=80" alt="Wireless earbuds" class="absolute inset-0 w-full h-full object-contain p-3 mix-blend-multiply" loading="lazy" onerror="this.style.display='none'" />
+              <span class="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-emerald-500 text-white text-[11px] font-bold">50% OFF</span>
+            </div>
+            <div class="mt-4 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase tracking-wider text-blue-600 font-bold">Flagship Wireless</span>
+                <span class="flex items-center gap-1 text-xs text-amber-400 font-bold">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i> 4.9 (480 reviews)
+                </span>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">SonicPulse Pro ANC Wireless</h3>
+              <p class="text-xs text-slate-500">Hybrid 42dB Active Noise Cancellation with LDAC Hi-Res Audio.</p>
+              
+              <div class="pt-3 flex items-center justify-between border-t border-slate-100">
+                <div>
+                  <span class="text-2xl font-black text-white">₹2,499</span>
+                  <span class="text-xs text-slate-400 line-through ml-1.5">₹4,999</span>
+                </div>
+                <button 
+                  onclick="addToCart(1)" 
+                  class="px-4 py-2 rounded-sm bg-[#2874f0] hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5"
+                >
+                  <i data-lucide="plus" class="w-4 h-4"></i> Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRODUCTS SECTION ================= -->
+  <main id="products-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+      <div>
+        <h2 class="text-2xl font-black tracking-tight text-slate-900" id="section-title">All Products</h2>
+        <p class="text-xs text-slate-500">Click "Quick Pay" for immediate single-click AyuPay modal, or add to cart for bundled checkout.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-400 font-medium">Sorted by:</span>
+        <select id="sort-select" onchange="handleSort(this.value)" class="text-xs font-semibold bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="featured">Featured First</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="rating">Top Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Product Grid Container -->
+    <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+      <!-- Product cards dynamically rendered by JS -->
+    </div>
+  </main>
+
+  <!-- ================= CART SLIDE-OVER DRAWER ================= -->
+  <div id="cart-drawer" class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0">
+    <!-- Backdrop -->
+    <div onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+    
+    <div class="absolute inset-y-0 right-0 max-w-full flex pl-10 pointer-events-auto">
+      <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col transform transition-transform duration-300 translate-x-full" id="cart-panel">
+        
+        <!-- Drawer Header -->
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 bg-sky-100 text-sky-700 rounded-xl">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Your Shopping Cart</h3>
+              <p class="text-xs text-slate-400" id="cart-items-summary">0 items selected</p>
+            </div>
+          </div>
+          <button onclick="toggleCartDrawer(false)" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200/60 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Drawer Item List -->
+        <div id="cart-items-list" class="flex-1 overflow-y-auto p-5 space-y-4">
+          <!-- Dynamically populated or empty state -->
+        </div>
+
+        <!-- Drawer Footer / Summary -->
+        <div class="border-t border-slate-100 p-5 bg-slate-50/80 space-y-4">
+          
+          <!-- Promo Code Box -->
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="coupon-input" 
+              placeholder="Promo code (Try: AYUSH10)" 
+              class="flex-1 uppercase text-xs font-mono px-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"
+            />
+            <button 
+              onclick="applyCoupon()" 
+              class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold transition"
+            >
+              Apply
+            </button>
+          </div>
+          <div id="coupon-message" class="text-[11px] hidden"></div>
+
+          <!-- Price Calculations -->
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span id="summary-subtotal" class="font-semibold text-slate-900">₹0.00</span>
+            </div>
+            <div class="flex justify-between text-emerald-600 hidden" id="discount-row">
+              <span id="discount-label">Special Coupon Discount</span>
+              <span id="summary-discount" class="font-bold">-₹0.00</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="flex items-center gap-1">Shipping <i data-lucide="info" class="w-3 h-3 text-slate-400" title="Free across India for orders above ₹500"></i></span>
+              <span id="summary-shipping" class="font-semibold text-emerald-600">FREE</span>
+            </div>
+            <div class="pt-2 border-t border-slate-200 flex justify-between text-base font-extrabold text-slate-900">
+              <span>Total Payable</span>
+              <span id="summary-total" class="text-sky-600 text-lg">₹0.00</span>
+            </div>
+          </div>
+
+          <!-- Checkout Button Triggering Programmatic AyuPay API -->
+          <button 
+            id="checkout-btn" 
+            onclick="initiateProgrammaticCheckout()" 
+            class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-600 via-indigo-600 to-sky-700 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-sky-600/25 flex items-center justify-center gap-2 transition transform active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+          >
+            <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
+            <span>Pay with AyuPay Gateway</span>
+          </button>
+
+          <p class="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1">
+            <i data-lucide="shield" class="w-3 h-3 text-emerald-500"></i> 100% Encrypted & Authenticated UPI Checkout
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ORDERS HISTORY MODAL ================= -->
+  <div id="orders-modal" class="fixed inset-0 z-50 hidden">
+    <div onclick="toggleOrdersModal(false)" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] relative z-10">
+        
+        <div class="p-5 bg-slate-900 text-white flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+              <i data-lucide="receipt" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-base">Transactions & Order History</h3>
+              <p class="text-xs text-slate-400">Authenticated UTR reference logs received from AyuPay</p>
+            </div>
+          </div>
+          <button onclick="toggleOrdersModal(false)" class="text-slate-400 hover:text-white p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div id="orders-container" class="p-5 overflow-y-auto space-y-3 flex-1">
+          <!-- Filled by JS -->
+        </div>
+
+        <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Merchant Webhook Verified via HMAC-SHA256</span>
+          <button onclick="clearOrderHistory()" class="text-red-500 hover:text-red-700 font-semibold">Clear History</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GATEWAY CONFIGURATION MODAL ================= -->
+  <div id="config-modal" class="fixed inset-0 z-50 hidden">
+    <div onclick="toggleConfigModal(false)" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden relative z-10">
+        
+        <div class="p-5 bg-indigo-900 text-white flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-indigo-300"></i>
+            <h3 class="font-bold text-base">AyuPay Gateway Settings</h3>
+          </div>
+          <button onclick="toggleConfigModal(false)" class="text-slate-300 hover:text-white p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Customer Checkout Base URL</label>
+            <input 
+              type="text" 
+              id="cfg-base-url" 
+              value="https://pay.ayupay.org" 
+              class="w-full text-xs font-mono px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+            <p class="text-[11px] text-slate-400 mt-1">Production customer checkout portal.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Merchant Public Key</label>
+            <input 
+              type="text" 
+              id="cfg-merchant-key" 
+              value="00000000-0000-0000-0000-000000000001" 
+              class="w-full text-xs font-mono px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+            <p class="text-[11px] text-slate-400 mt-1">Found in your Merchant Admin at <a href="http://localhost:6001" target="_blank" class="text-indigo-600 underline">http://localhost:6001</a></p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Customer Identifier (for demo receipts)</label>
+            <input 
+              type="text" 
+              id="cfg-customer-name" 
+              value="Ayush (Store Owner)" 
+              class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-xs">
+            <div class="flex items-center gap-1.5 font-bold mb-1">
+              <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600"></i> Fallback Engine Included
+            </div>
+            If your local AyuPay server is starting up or stopped, this store automatically switches into an interactive simulator so you can test payments and UTR fulfillment seamlessly.
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+          <button onclick="toggleConfigModal(false)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg">Close</button>
+          <button onclick="saveGatewayConfig()" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm">Save & Reload Gateway</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FALLBACK SIMULATION MODAL ================= -->
+  <!-- Automatically shown if window.Youpi script cannot be contacted at port 7000 -->
+  <div id="fallback-pay-modal" class="fixed inset-0 z-50 hidden">
+    <div onclick="closeFallbackModal()" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden relative z-10 flex flex-col animate-in fade-in zoom-in duration-200">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-sky-600 to-indigo-700 text-white p-5 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-bold">
+              <i data-lucide="qr-code" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-black">AyuPay Checkout</h3>
+              <p class="text-[11px] text-sky-200">Autonomous Payment & UTR Verification</p>
+            </div>
+          </div>
+          <button onclick="closeFallbackModal()" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-5 text-center">
+          <div>
+            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Amount to Pay</p>
+            <p id="fallback-amount-display" class="text-3xl font-extrabold text-slate-900 mt-1">₹499.00</p>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-mono mt-2">
+              <span id="fallback-order-id">AYUSH-ORD-1001</span>
+            </div>
+          </div>
+
+          <!-- Dynamic QR SVG Representation -->
+          <div class="flex flex-col items-center justify-center p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl">
+            <div class="w-44 h-44 bg-white p-3 rounded-xl shadow-md border border-slate-100 flex items-center justify-center relative">
+              <svg viewBox="0 0 100 100" class="w-full h-full text-slate-900">
+                <rect x="0" y="0" width="30" height="30" rx="3" fill="currentColor"/>
+                <rect x="5" y="5" width="20" height="20" rx="2" fill="white"/>
+                <rect x="10" y="10" width="10" height="10" rx="1" fill="currentColor"/>
+
+                <rect x="70" y="0" width="30" height="30" rx="3" fill="currentColor"/>
+                <rect x="75" y="5" width="20" height="20" rx="2" fill="white"/>
+                <rect x="80" y="10" width="10" height="10" rx="1" fill="currentColor"/>
+
+                <rect x="0" y="70" width="30" height="30" rx="3" fill="currentColor"/>
+                <rect x="5" y="75" width="20" height="20" rx="2" fill="white"/>
+                <rect x="10" y="80" width="10" height="10" rx="1" fill="currentColor"/>
+
+                <!-- Random data cells -->
+                <circle cx="45" cy="15" r="3" fill="currentColor"/>
+                <circle cx="55" cy="15" r="3" fill="currentColor"/>
+                <circle cx="40" cy="35" r="3" fill="currentColor"/>
+                <circle cx="50" cy="45" r="4" fill="currentColor"/>
+                <circle cx="60" cy="35" r="3" fill="currentColor"/>
+                <circle cx="45" cy="55" r="3" fill="currentColor"/>
+                <circle cx="65" cy="55" r="3" fill="currentColor"/>
+                <circle cx="85" cy="45" r="3" fill="currentColor"/>
+                <circle cx="35" cy="75" r="3" fill="currentColor"/>
+                <circle cx="55" cy="75" r="3" fill="currentColor"/>
+                <circle cx="45" cy="85" r="3" fill="currentColor"/>
+                <circle cx="75" cy="85" r="3" fill="currentColor"/>
+                <circle cx="85" cy="75" r="3" fill="currentColor"/>
+              </svg>
+              <!-- Center Logo -->
+              <div class="absolute inset-0 m-auto w-8 h-8 rounded-lg bg-sky-600 flex items-center justify-center text-white text-xs font-black shadow-md border-2 border-white">
+                ₹
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-2 font-medium">Scan using any UPI App (GPay / PhonePe / Paytm)</p>
+          </div>
+
+          <!-- UTR Entry Simulation -->
+          <div class="space-y-2 text-left">
+            <label class="block text-xs font-bold text-slate-700">12-Digit Bank UTR / Reference No.</label>
+            <div class="flex gap-2">
+              <input 
+                type="text" 
+                id="fallback-utr-input" 
+                maxlength="12" 
+                placeholder="428819283741" 
+                value="428819283741"
+                class="flex-1 font-mono text-sm px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              />
+              <button 
+                onclick="generateRandomUTR()" 
+                title="Randomize UTR" 
+                class="px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition text-xs font-bold"
+              >
+                Auto
+              </button>
+            </div>
+          </div>
+
+          <!-- Confirm Action -->
+          <button 
+            onclick="confirmFallbackPayment()" 
+            class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2"
+          >
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Confirm Payment & Trigger Webhook</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAYMENT SUCCESS NOTIFICATION MODAL ================= -->
+  <div id="success-modal" class="fixed inset-0 z-50 hidden">
+    <div onclick="closeSuccessModal()" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden relative z-10 text-center p-6 space-y-4 animate-in fade-in zoom-in duration-200">
+        
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center shadow-inner">
+          <i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>
+        </div>
+
+        <div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 mb-2">
+            AyuPay Authoritative Confirmed
+          </span>
+          <h3 class="text-xl font-black text-slate-900">Payment Successful!</h3>
+          <p class="text-xs text-slate-500 mt-1">Your order has been verified and added to Ayush Store database.</p>
+        </div>
+
+        <!-- Receipt Card -->
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-xs space-y-2 text-left font-mono">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Order ID:</span>
+            <span id="succ-order-id" class="font-bold text-slate-800">AYUSH-ORD-0000</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Amount Paid:</span>
+            <span id="succ-amount" class="font-bold text-emerald-600">₹0.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Bank UTR:</span>
+            <span id="succ-utr" class="font-bold text-slate-800">UTR-XXXX</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Webhook Status:</span>
+            <span class="text-emerald-700 font-bold flex items-center gap-1">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> HMAC Validated
+            </span>
+          </div>
+        </div>
+
+        <button 
+          onclick="closeSuccessModal()" 
+          class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition"
+        >
+          Back to Storefront
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST CONTAINER ================= -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ================= CONTACT FORM ================= -->
+  <section id="contact" class="w-full bg-white border-t border-slate-200 py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
+        <h2 class="text-xl font-extrabold text-slate-900">Contact Ayush Store</h2>
+        <p class="text-sm text-slate-500 mt-1 mb-5">Send us a question and our team will get back to you.</p>
+        <form id="store-contact-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="text-xs font-semibold text-slate-700">Your name<input name="name" required maxlength="255" autocomplete="name" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm" /></label>
+          <label class="text-xs font-semibold text-slate-700">Email<input name="email" type="email" required maxlength="255" autocomplete="email" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm" /></label>
+          <label class="text-xs font-semibold text-slate-700 sm:col-span-2">Phone (optional)<input name="phone" type="tel" maxlength="32" autocomplete="tel" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm" /></label>
+          <label class="text-xs font-semibold text-slate-700 sm:col-span-2">How can we help?<textarea name="message" required minlength="5" maxlength="5000" rows="4" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm"></textarea></label>
+          <div class="sm:col-span-2 flex items-center gap-3"><button id="store-contact-submit" type="submit" class="rounded-lg bg-[#2874f0] px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700">Send message</button><span id="store-contact-status" class="text-sm text-slate-500" role="status" aria-live="polite"></span></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-auto bg-slate-900 text-slate-400 text-xs py-10 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 text-white">
+          <div class="w-7 h-7 rounded-lg bg-sky-600 flex items-center justify-center font-bold">A</div>
+          <span class="text-base font-bold">Ayush Store</span>
+        </div>
+        <p class="text-slate-400 text-[11px] leading-relaxed">
+          Universal UPI & Card Payment Gateway Architecture powered by the high-throughput YOUPI-PG node cluster.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 text-xs uppercase tracking-wider">Gateway Endpoints</h4>
+        <ul class="space-y-1.5 text-[11px]">
+          <li><a href="http://localhost:8090" target="_blank" class="hover:text-white transition flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Supervisor :8090</a></li>
+          <li><a href="http://localhost:6001" target="_blank" class="hover:text-white transition flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Merchant Portal :6001</a></li>
+          <li><a href="https://api.ayupay.org/health" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Payment REST API</a></li>
+          <li><a href="https://pay.ayupay.org" target="_blank" rel="noopener noreferrer" class="hover:text-white transition flex items-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Checkout Hosted UI</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 text-xs uppercase tracking-wider">Payment Verification</h4>
+        <p class="text-[11px] leading-relaxed text-slate-400">
+          Raw body payload hashing via <code class="text-sky-400 bg-slate-800 px-1 py-0.5 rounded">crypto.createHmac('sha256')</code> ensures order integrity against frontend tampering.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="text-white font-bold mb-3 text-xs uppercase tracking-wider">Fast Links</h4>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="toggleConfigModal(true)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px]">Gateway Config</button>
+          <button onclick="toggleOrdersModal(true)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px]">Audit Logs</button>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 mt-8 pt-6 border-t border-slate-800/60 text-center text-slate-500 text-[11px]">
+      Ayush Store &copy; 2026. Fully compatible with AyuPay Universal Script & REST SDK.
+      <a href="/ayupay-privacy-policy.html" class="ml-2 text-blue-300 hover:text-white underline">Privacy Policy</a>
+      <span class="block mt-1">Demo product photos from Unsplash. Product names, prices, ratings, and discounts are illustrative.</span>
+    </div>
+  </footer>
+
+  <!-- ================= APPLICATION LOGIC ================= -->
+  <script>
+    /* ----------------------------------------------------
+       1. CATALOG DATA (Realistic Indian Electronics Store)
+    ---------------------------------------------------- */
+    const PRODUCTS = [
+      {
+        id: 1,
+        name: "SonicPulse Pro ANC Wireless",
+        category: "Audio",
+        price: 2499,
+        originalPrice: 4999,
+        rating: 4.9,
+        reviews: 480,
+        badge: "Bestseller",
+        icon: "headphones",
+        image: "https://images.unsplash.com/photo-1640901821270-6e9c47fbdc07?auto=format&fit=crop&w=800&q=80",
+        description: "Hybrid 42dB Active Noise Cancellation with LDAC & 50h battery.",
+        inStock: true
+      },
+      {
+        id: 2,
+        name: "AeroTrack Ultra AMOLED Watch",
+        category: "Wearables",
+        price: 3299,
+        originalPrice: 6999,
+        rating: 4.8,
+        reviews: 312,
+        badge: "New",
+        icon: "watch",
+        image: "https://images.unsplash.com/photo-1624096104992-9b4fa3a279dd?auto=format&fit=crop&w=800&q=80",
+        description: "1.96\" Super AMOLED display with Bluetooth calling & SpO2 sensor.",
+        inStock: true
+      },
+      {
+        id: 3,
+        name: "TitanCharge 20,000mAh 65W GaN",
+        category: "Power",
+        price: 1899,
+        originalPrice: 3499,
+        rating: 4.7,
+        reviews: 198,
+        badge: "Fast Charge",
+        icon: "battery-charging",
+        image: "https://images.unsplash.com/photo-1564286027156-9ad736dfbbbb?auto=format&fit=crop&w=800&q=80",
+        description: "Triple-port PD 3.0 charges MacBooks, iPhones & Samsung devices at 65W.",
+        inStock: true
+      },
+      {
+        id: 4,
+        name: "MechStrike RGB Mechanical Keyboard",
+        category: "Gaming",
+        price: 2199,
+        originalPrice: 4299,
+        rating: 4.9,
+        reviews: 520,
+        badge: "Hot Deal",
+        icon: "keyboard",
+        image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80",
+        description: "Hot-swappable tactile blue switches with per-key RGB backlighting.",
+        inStock: true
+      },
+      {
+        id: 5,
+        name: "QuantumBass Bluetooth 5.3 Speaker",
+        category: "Audio",
+        price: 1499,
+        originalPrice: 2999,
+        rating: 4.6,
+        reviews: 142,
+        badge: "IPX7 Waterproof",
+        icon: "volume-2",
+        image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?auto=format&fit=crop&w=800&q=80",
+        description: "Dual passive radiators delivering 24W punchy stereo bass outdoor sound.",
+        inStock: true
+      },
+      {
+        id: 6,
+        name: "OmniStand MagSafe Aluminum Dock",
+        category: "Accessories",
+        price: 899,
+        originalPrice: 1599,
+        rating: 4.5,
+        reviews: 89,
+        badge: "Minimal",
+        icon: "smartphone",
+        image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
+        description: "CNC Machined aero-grade aluminum wireless 15W magnetic stand.",
+        inStock: true
+      },
+      {
+        id: 7,
+        name: "ViperGrip 12000DPI Optical Gaming Mouse",
+        category: "Gaming",
+        price: 1299,
+        originalPrice: 2499,
+        rating: 4.8,
+        reviews: 260,
+        badge: "Low Latency",
+        icon: "mouse",
+        image: "https://images.unsplash.com/photo-1627850743564-20d3c0125ea8?auto=format&fit=crop&w=800&q=80",
+        description: "Ultra-lightweight honeycomb shell with 1ms polling rate switches.",
+        inStock: true
+      },
+      {
+        id: 8,
+        name: "PowerVolt 45W Dual USB-C GaN Brick",
+        category: "Power",
+        price: 999,
+        originalPrice: 1999,
+        rating: 4.7,
+        reviews: 110,
+        badge: "Compact",
+        icon: "plug-zap",
+        image: "https://images.unsplash.com/photo-1579675397338-7a83f91a51e7?auto=format&fit=crop&w=800&q=80",
+        description: "Pocket-sized GaN III architecture with smart PPS dynamic power routing.",
+        inStock: true
+      },
+      {
+        id: 9,
+        name: "₹1 Real Payment Test Item",
+        category: "Accessories",
+        price: 1,
+        originalPrice: 1,
+        rating: 0,
+        reviews: 0,
+        badge: "Payment Test",
+        icon: "credit-card",
+        image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
+        description: "Use this item to test a real ₹1 checkout. Payment goes to your active merchant UPI ID.",
+        inStock: true
+      },
+      {
+        id: 10,
+        name: "Free Demo Accessory",
+        category: "Accessories",
+        price: 0,
+        originalPrice: 0,
+        rating: 0,
+        reviews: 0,
+        badge: "FREE",
+        icon: "gift",
+        description: "Free catalog demo item. It does not create a payment or fulfillment order.",
+        inStock: true
+      }
+    ];
+
+    /* ----------------------------------------------------
+       2. APPLICATION STATE
+    ---------------------------------------------------- */
+    let cart = [];
+    let currentFilter = 'all';
+    let currentSort = 'featured';
+    let appliedDiscount = 0; // in percent (e.g. 10)
+    let appliedCouponCode = null;
+    let orderHistory = [];
+    let pendingCheckoutPayload = null; // Used for fallback modal
+
+    // Default configuration matching AyuPay standards
+    const API_BASE = 'https://api.ayupay.org';
+    const GATEWAY_URL = 'https://pay.ayupay.org';
+    let gatewayConfig = {
+      baseUrl: GATEWAY_URL,
+      merchantKey: '00000000-0000-0000-0000-000000000001',
+      customerName: 'Ayush (Store Owner)'
+    };
+
+    /* ----------------------------------------------------
+       3. INITIALIZATION & GATEWAY HEARTBEAT CHECK
+    ---------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStateFromStorage();
+      recordStorefrontVisit();
+      renderProducts();
+      updateCartUI();
+      renderOrdersHistory();
+      lucide.createIcons();
+      checkGatewayHealth();
+
+      // Set up declarative button listener
+      setupDeclarativeListeners();
+    });
+
+    // Check if the AyuPay customer portal is alive
+    async function checkGatewayHealth() {
+      const statusEl = document.getElementById('gateway-status');
+      try {
+        const response = await fetch(`${gatewayConfig.baseUrl}/youpi.js`, { method: 'HEAD', mode: 'no-cors' });
+        // In no-cors mode, reaching it indicates the service is up
+        statusEl.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-emerald-400">AyuPay Connected (:7000)</span>
+        `;
+      } catch (err) {
+        // If not running, inform user fallback mode is enabled
+        statusEl.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="text-amber-300">Port 7000 Offline (Simulator Active)</span>
+        `;
+      }
+    }
+
+    /* ----------------------------------------------------
+       4. PRODUCTS RENDERING & FILTERING
+    ---------------------------------------------------- */
+    function renderProducts() {
+      const grid = document.getElementById('product-grid');
+      let items = [...PRODUCTS];
+
+      // Filter by category
+      if (currentFilter !== 'all') {
+        items = items.filter(p => p.category === currentFilter);
+      }
+
+      // Filter by search term
+      const searchVal = document.getElementById('search-input')?.value.toLowerCase().trim();
+      if (searchVal) {
+        items = items.filter(p => 
+          p.name.toLowerCase().includes(searchVal) || 
+          p.description.toLowerCase().includes(searchVal) ||
+          p.category.toLowerCase().includes(searchVal)
+        );
+      }
+
+      // Sort
+      if (currentSort === 'price-low') {
+        items.sort((a, b) => a.price - b.price);
+      } else if (currentSort === 'price-high') {
+        items.sort((a, b) => b.price - a.price);
+      } else if (currentSort === 'rating') {
+        items.sort((a, b) => b.rating - a.rating);
+      }
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-slate-400">
+            <i data-lucide="package-search" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
+            <p class="font-bold text-base text-slate-600">No electronics found</p>
+            <p class="text-xs">Try searching with a different term or clear the filter.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = items.map(product => {
+        const discountPct = product.originalPrice > 0
+          ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+          : 0;
+        const orderId = `AYUSH-PROD-${product.id}-${Date.now().toString().slice(-4)}`;
+
+        return `
+          <div class="bg-white rounded-sm border border-slate-100 hover:border-blue-200 p-3 sm:p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between group">
+            
+            <!-- Card Image Area -->
+            <div>
+              <div class="relative h-36 sm:h-48 w-full bg-white flex items-center justify-center overflow-hidden mb-3">
+                <i data-lucide="${product.icon}" class="w-16 h-16 text-slate-300 group-hover:scale-110 group-hover:text-blue-600 transition duration-300"></i>
+                ${product.image ? `<img src="${product.image}" alt="${product.name}" class="absolute inset-0 w-full h-full object-contain p-2 sm:p-3 mix-blend-multiply group-hover:scale-105 transition duration-300" loading="lazy" onerror="this.style.display='none'" />` : ''}
+                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-sm bg-slate-800/90 text-white text-[10px] font-bold backdrop-blur-sm">
+                  ${product.badge}
+                </span>
+                <span class="absolute top-2 right-2 px-1.5 py-0.5 rounded-sm bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                  ${product.price === 0 ? 'FREE' : `${discountPct}% OFF`}
+                </span>
+              </div>
+
+              <!-- Product Info -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-[11px] text-slate-400">
+                  <span class="font-bold text-blue-600 uppercase">${product.category}</span>
+                  <span class="flex items-center gap-1 text-amber-500 font-semibold">
+                    <i data-lucide="star" class="w-3 h-3 fill-amber-400"></i> ${product.rating} (${product.reviews})
+                  </span>
+                </div>
+                <h3 class="font-medium text-sm text-slate-900 group-hover:text-blue-600 transition leading-snug line-clamp-2 min-h-10">
+                  ${product.name}
+                </h3>
+                <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed hidden sm:block">
+                  ${product.description}
+                </p>
+              </div>
+            </div>
+
+            <!-- Pricing & Actions -->
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2">
+              <div class="flex items-baseline gap-2">
+                <span class="text-xl font-extrabold text-slate-900">₹${product.price.toLocaleString('en-IN')}</span>
+                ${product.originalPrice > product.price ? `<span class="text-xs text-slate-400 line-through">₹${product.originalPrice.toLocaleString('en-IN')}</span>` : ''}
+              </div>
+
+              ${product.price === 0 ? `
+              <div class="pt-1">
+                <button type="button" disabled class="w-full py-2 px-2 rounded-sm bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs cursor-default">
+                  Free demo item · no payment required
+                </button>
+              </div>
+              ` : `
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <!-- Add To Cart -->
+                <button 
+                  onclick="addToCart(${product.id})" 
+                  class="w-full py-2 px-1 sm:px-2 rounded-sm bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-bold text-[10px] sm:text-xs transition flex items-center justify-center gap-1"
+                >
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> Cart
+                </button>
+
+                <!-- Declarative YOUPI Button (Step 2 of Universal Spec) -->
+                <button 
+                  data-youpi-pay
+                  data-order-id="${orderId}"
+                  data-amount="${product.price}.00"
+                  data-currency="INR"
+                  data-product-name="${product.name}"
+                  class="youpi-quick-btn w-full py-2 px-1 sm:px-2 rounded-sm bg-[#2874f0] hover:bg-blue-700 text-white font-bold text-[10px] sm:text-xs shadow-sm transition flex items-center justify-center gap-1"
+                >
+                  <i data-lucide="zap" class="w-3.5 h-3.5 fill-white"></i> Quick Pay
+                </button>
+              </div>
+              `}
+            </div>
+
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+      setupDeclarativeListeners();
+    }
+
+    function filterCategory(cat) {
+      currentFilter = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'cat-pill active px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-sky-600 text-white shadow-sm shadow-sky-600/20';
+        } else {
+          btn.className = 'cat-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-slate-100 hover:bg-slate-200 text-slate-600';
+        }
+      });
+      document.getElementById('section-title').innerText = cat === 'all' ? 'All Tech Catalog' : `${cat} Collection`;
+      renderProducts();
+    }
+
+    function handleSearch(val) {
+      renderProducts();
+    }
+
+    function handleSort(val) {
+      currentSort = val;
+      renderProducts();
+    }
+
+    /* ----------------------------------------------------
+       5. CART OPERATIONS
+    ---------------------------------------------------- */
+    function addToCart(productId) {
+      const prod = PRODUCTS.find(p => p.id === productId);
+      if (!prod) return;
+
+      const existing = cart.find(item => item.id === productId);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ ...prod, quantity: 1 });
+      }
+
+      updateCartUI();
+      showToast(`Added "${prod.name}" to cart!`, 'success');
+    }
+
+    function updateQuantity(productId, delta) {
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        cart = cart.filter(i => i.id !== productId);
+      }
+      updateCartUI();
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(i => i.id !== productId);
+      updateCartUI();
+      showToast('Item removed from cart', 'info');
+    }
+
+    function calculateCartTotals() {
+      const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+      let discountAmount = 0;
+      if (appliedDiscount > 0) {
+        discountAmount = (subtotal * appliedDiscount) / 100;
+      }
+      const total = Math.max(0, subtotal - discountAmount);
+      return { subtotal, discountAmount, total };
+    }
+
+    function updateCartUI() {
+      saveStateToStorage();
+      const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+      
+      // Update badge counters
+      document.getElementById('cart-counter').innerText = totalItems;
+      document.getElementById('cart-items-summary').innerText = `${totalItems} items selected`;
+
+      const listEl = document.getElementById('cart-items-list');
+      const checkoutBtn = document.getElementById('checkout-btn');
+
+      if (cart.length === 0) {
+        checkoutBtn.disabled = true;
+        listEl.innerHTML = `
+          <div class="h-64 flex flex-col items-center justify-center text-center text-slate-400">
+            <i data-lucide="shopping-bag" class="w-12 h-12 mb-2 stroke-[1.5] text-slate-300"></i>
+            <p class="font-bold text-slate-600 text-sm">Your cart is empty</p>
+            <p class="text-xs">Explore products and add items to begin checkout.</p>
+          </div>
+        `;
+      } else {
+        checkoutBtn.disabled = false;
+        listEl.innerHTML = cart.map(item => `
+          <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+            <div class="w-14 h-14 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+              <i data-lucide="${item.icon}" class="w-7 h-7 text-sky-600"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-bold text-xs text-slate-800 truncate">${item.name}</h4>
+              <p class="text-xs text-sky-600 font-extrabold">₹${item.price.toLocaleString('en-IN')}</p>
+              
+              <!-- Quantity buttons -->
+              <div class="flex items-center gap-2 mt-2">
+                <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 rounded-md bg-white border border-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs hover:bg-slate-100">-</button>
+                <span class="text-xs font-bold text-slate-800 w-4 text-center">${item.quantity}</span>
+                <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 rounded-md bg-white border border-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs hover:bg-slate-100">+</button>
+              </div>
+            </div>
+            <button onclick="removeFromCart(${item.id})" class="text-slate-400 hover:text-red-500 p-2">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Calculations
+      const { subtotal, discountAmount, total } = calculateCartTotals();
+      document.getElementById('summary-subtotal').innerText = `₹${subtotal.toLocaleString('en-IN')}.00`;
+      
+      const discountRow = document.getElementById('discount-row');
+      if (discountAmount > 0) {
+        discountRow.classList.remove('hidden');
+        document.getElementById('discount-label').innerText = `Coupon (${appliedCouponCode} ${appliedDiscount}%)`;
+        document.getElementById('summary-discount').innerText = `-₹${discountAmount.toLocaleString('en-IN')}.00`;
+      } else {
+        discountRow.classList.add('hidden');
+      }
+
+      document.getElementById('summary-total').innerText = `₹${total.toLocaleString('en-IN')}.00`;
+      lucide.createIcons();
+    }
+
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cart-drawer');
+      const panel = document.getElementById('cart-panel');
+      if (open) {
+        drawer.classList.add('cart-drawer-open');
+        drawer.classList.remove('pointer-events-none', 'opacity-0');
+        panel.classList.remove('translate-x-full');
+      } else {
+        drawer.classList.remove('cart-drawer-open');
+        drawer.classList.add('opacity-0', 'pointer-events-none');
+        panel.classList.add('translate-x-full');
+      }
+    }
+
+    function applyCoupon() {
+      const input = document.getElementById('coupon-input');
+      const code = input.value.trim().toUpperCase();
+      const msg = document.getElementById('coupon-message');
+
+      if (code === 'AYUSH10') {
+        appliedDiscount = 10;
+        appliedCouponCode = 'AYUSH10';
+        msg.className = 'text-[11px] text-emerald-600 font-semibold block';
+        msg.innerText = '⚡ Coupon Applied: 10% Flat Instant Discount!';
+        showToast('Promo code AYUSH10 applied!', 'success');
+      } else if (code === 'VIP50') {
+        appliedDiscount = 50;
+        appliedCouponCode = 'VIP50';
+        msg.className = 'text-[11px] text-emerald-600 font-semibold block';
+        msg.innerText = '⚡ Developer VIP Promo: 50% Flat Discount!';
+        showToast('VIP code VIP50 applied!', 'success');
+      } else {
+        appliedDiscount = 0;
+        appliedCouponCode = null;
+        msg.className = 'text-[11px] text-red-500 font-semibold block';
+        msg.innerText = 'Invalid promo code. Try AYUSH10';
+        showToast('Invalid Coupon Code', 'error');
+      }
+      updateCartUI();
+    }
+
+    /* ----------------------------------------------------
+       6. AyuPay INTEGRATION (PROGRAMMATIC & DECLARATIVE)
+    ---------------------------------------------------- */
+
+    // Step 2 & 3: Setup Declarative Button Handlers
+    function setupDeclarativeListeners() {
+      document.querySelectorAll('.youpi-quick-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          e.preventDefault();
+          const orderId = btn.getAttribute('data-order-id') || `AYUSH-QCK-${Date.now().toString().slice(-4)}`;
+          const amount = parseFloat(btn.getAttribute('data-amount') || '499.00');
+          const productName = btn.getAttribute('data-product-name') || 'Direct Quick Checkout';
+
+          triggerPaymentGateway({
+            order_id: orderId,
+            amount: amount,
+            currency: 'INR',
+            name: 'Ayush Tech Store',
+            description: productName
+          });
+        };
+      });
+    }
+
+    function handleQuickHeroPay(button) {
+      triggerPaymentGateway({
+        order_id: 'AYUSH-HERO-' + Date.now().toString().slice(-4),
+        amount: 2499.00,
+        currency: 'INR',
+        name: 'Ayush Tech Store',
+        description: 'SonicPulse Pro ANC Wireless (Festive Special)'
+      });
+    }
+
+    // Step 3: Programmatic API Invocation
+    function initiateProgrammaticCheckout() {
+      if (cart.length === 0) return;
+      const { total } = calculateCartTotals();
+      const generatedOrderId = `AYUSH-ORD-${Date.now().toString().slice(-6)}`;
+
+      toggleCartDrawer(false);
+
+      triggerPaymentGateway({
+        order_id: generatedOrderId,
+        amount: total,
+        currency: 'INR',
+        name: 'Ayush Tech Store',
+        description: `Order for ${cart.length} electronics product(s)`
+      });
+    }
+
+    // Core gateway launcher (Supports official window.Youpi.pay or gracefully falls back)
+    function triggerPaymentGateway(payload) {
+      pendingCheckoutPayload = payload;
+
+      // Check if official universal SDK is loaded
+      if (window.Youpi && typeof window.Youpi.pay === 'function') {
+        try {
+          let failureToastShown = false;
+          const paymentAttempt = window.Youpi.pay({
+            order_id: payload.order_id,
+            amount: payload.amount,
+            currency: payload.currency || 'INR',
+            name: payload.name || 'Ayush Tech Store',
+            description: payload.description || 'Electronics Purchase',
+            handler: function(response) {
+              // response: { status: 'SUCCESS', order_id, amount_received, utr }
+              handlePaymentSuccess(response.order_id, response.utr, payload.amount);
+            },
+            onClose: function() {
+              showToast('Payment modal dismissed by user', 'info');
+            },
+            onFailed: function(result) {
+              failureToastShown = true;
+              showToast(result?.reason || result?.error || 'Payment could not be started. Please try again.', 'error');
+            }
+          });
+          // Youpi.pay() is asynchronous; a synchronous try/catch cannot handle API,
+          // CORS, or network failures. Surface those failures instead of leaving the
+          // Quick Pay / cart buttons appearing unresponsive.
+          if (paymentAttempt && typeof paymentAttempt.catch === 'function') {
+            paymentAttempt.catch((error) => {
+              console.error('[AyushStore] Payment initialization failed:', error);
+              if (!failureToastShown) {
+                showToast(`Could not start payment: ${error?.message || 'Please check your connection and try again.'}`, 'error');
+              }
+            });
+          }
+          return;
+        } catch (e) {
+          console.warn("YOUPI script execution intercepted; using local fallback simulator.", e);
+        }
+      }
+
+      // If the configured checkout portal is unavailable, launch the local simulator.
+      launchFallbackSimulator(payload);
+    }
+
+    /* ----------------------------------------------------
+       7. FALLBACK SIMULATOR MODAL (Autonomous Standalone Engine)
+    ---------------------------------------------------- */
+    function launchFallbackSimulator(payload) {
+      document.getElementById('fallback-amount-display').innerText = `₹${payload.amount.toLocaleString('en-IN')}.00`;
+      document.getElementById('fallback-order-id').innerText = payload.order_id;
+      generateRandomUTR();
+      document.getElementById('fallback-pay-modal').classList.remove('hidden');
+    }
+
+    function closeFallbackModal() {
+      document.getElementById('fallback-pay-modal').classList.add('hidden');
+    }
+
+    function generateRandomUTR() {
+      const randUTR = '42' + Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      document.getElementById('fallback-utr-input').value = randUTR;
+    }
+
+    function confirmFallbackPayment() {
+      const utr = document.getElementById('fallback-utr-input').value.trim() || '428819283741';
+      const orderId = pendingCheckoutPayload ? pendingCheckoutPayload.order_id : `AYUSH-ORD-${Date.now().toString().slice(-4)}`;
+      const amount = pendingCheckoutPayload ? pendingCheckoutPayload.amount : 499;
+
+      closeFallbackModal();
+      handlePaymentSuccess(orderId, utr, amount);
+    }
+
+    /* ----------------------------------------------------
+       8. AUTHORITATIVE PAYMENT SUCCESS & WEBHOOK SIMULATION
+    ---------------------------------------------------- */
+    function handlePaymentSuccess(orderId, utr, amount) {
+      // 1. Record authoritative order in local store history
+      const newOrder = {
+        orderId: orderId,
+        amount: amount,
+        utr: utr,
+        timestamp: new Date().toLocaleString(),
+        status: 'SUCCESS',
+        deliveryId: 'dlv_' + Math.random().toString(36).substring(2, 10),
+        signature: 'sha256=' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('')
+      };
+
+      orderHistory.unshift(newOrder);
+      saveStateToStorage();
+      renderOrdersHistory();
+
+      // 2. Clear shopping cart
+      cart = [];
+      updateCartUI();
+
+      // 3. Show Success Modal
+      document.getElementById('succ-order-id').innerText = orderId;
+      document.getElementById('succ-amount').innerText = `₹${amount.toLocaleString('en-IN')}.00`;
+      document.getElementById('succ-utr').innerText = utr;
+      document.getElementById('success-modal').classList.remove('hidden');
+
+      showToast(`Payment Confirmed! UTR: ${utr}`, 'success');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('success-modal').classList.add('hidden');
+    }
+
+    /* ----------------------------------------------------
+       9. ORDERS & AUDIT HISTORY
+    ---------------------------------------------------- */
+    function renderOrdersHistory() {
+      const container = document.getElementById('orders-container');
+      const badge = document.getElementById('orders-count-badge');
+      
+      if (orderHistory.length > 0) {
+        badge.innerText = orderHistory.length;
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      if (orderHistory.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-slate-400">
+            <i data-lucide="file-question" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+            <p class="font-bold text-sm text-slate-600">No orders placed yet</p>
+            <p class="text-xs">Complete a purchase via AyuPay to view your transactions.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = orderHistory.map(ord => `
+        <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-bold text-slate-900">${ord.orderId}</span>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> PAID (₹${ord.amount.toLocaleString('en-IN')})
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-500 font-mono">
+            <div><span class="text-slate-400">UTR:</span> <span class="font-semibold text-slate-800">${ord.utr}</span></div>
+            <div><span class="text-slate-400">Time:</span> ${ord.timestamp}</div>
+          </div>
+          <div class="pt-1 text-[10px] text-slate-400 font-mono truncate">
+            <span class="text-indigo-600 font-semibold">HMAC:</span> ${ord.signature}
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function toggleOrdersModal(open) {
+      const modal = document.getElementById('orders-modal');
+      if (open) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function clearOrderHistory() {
+      orderHistory = [];
+      saveStateToStorage();
+      renderOrdersHistory();
+      showToast('Order history cleared', 'info');
+    }
+
+    /* ----------------------------------------------------
+       10. CONFIGURATION DRAWER
+    ---------------------------------------------------- */
+    function toggleConfigModal(open) {
+      const modal = document.getElementById('config-modal');
+      if (open) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function saveGatewayConfig() {
+      gatewayConfig.baseUrl = document.getElementById('cfg-base-url').value.trim();
+      gatewayConfig.merchantKey = document.getElementById('cfg-merchant-key').value.trim();
+      gatewayConfig.customerName = document.getElementById('cfg-customer-name').value.trim();
+
+      // Dynamically re-inject or update the script tag
+      const existingScript = document.getElementById('youpi-script');
+      if (existingScript) existingScript.remove();
+
+      const newScript = document.createElement('script');
+      newScript.id = 'youpi-script';
+      newScript.src = `${gatewayConfig.baseUrl}/youpi.js`;
+      newScript.setAttribute('data-youpi-key', gatewayConfig.merchantKey);
+      newScript.setAttribute('data-currency', 'INR');
+      newScript.setAttribute('data-api-url', API_BASE);
+      newScript.setAttribute('data-portal-url', gatewayConfig.baseUrl);
+      document.head.appendChild(newScript);
+
+      saveStateToStorage();
+      toggleConfigModal(false);
+      showToast('Gateway configuration updated & refreshed', 'success');
+      checkGatewayHealth();
+    }
+
+    /* ----------------------------------------------------
+       11. LOCAL STORAGE & TOAST HELPER
+    ---------------------------------------------------- */
+    function saveStateToStorage() {
+      localStorage.setItem('ayush_cart', JSON.stringify(cart));
+      localStorage.setItem('ayush_orders', JSON.stringify(orderHistory));
+      localStorage.setItem('ayush_config', JSON.stringify(gatewayConfig));
+    }
+
+    function loadStateFromStorage() {
+      try {
+        const savedCart = localStorage.getItem('ayush_cart');
+        if (savedCart) cart = JSON.parse(savedCart);
+
+        const savedOrders = localStorage.getItem('ayush_orders');
+        if (savedOrders) orderHistory = JSON.parse(savedOrders);
+
+        const savedConfig = localStorage.getItem('ayush_config');
+        if (savedConfig) gatewayConfig = JSON.parse(savedConfig);
+
+        // Migrate previously saved local development URLs to the configured production gateway.
+        if (!gatewayConfig.baseUrl || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(gatewayConfig.baseUrl)) {
+          gatewayConfig.baseUrl = GATEWAY_URL;
+        }
+
+        document.getElementById('cfg-base-url').value = gatewayConfig.baseUrl || GATEWAY_URL;
+        document.getElementById('cfg-merchant-key').value = gatewayConfig.merchantKey || '00000000-0000-0000-0000-000000000001';
+      } catch (e) {
+        console.error("Storage loading error:", e);
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: 'bg-emerald-600 text-white shadow-emerald-600/30',
+        error: 'bg-rose-600 text-white shadow-rose-600/30',
+        info: 'bg-slate-900 text-white shadow-slate-900/30'
+      };
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 transform transition-all duration-300 translate-y-3 opacity-0 ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-triangle' : 'info'}" class="w-4 h-4"></i>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-3', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Record anonymous storefront visits using a random browser identifier; do not collect IP addresses.
+    function recordStorefrontVisit() {
+      try {
+        let visitorKey = localStorage.getItem('ayush_store_visitor_key');
+        if (!visitorKey) {
+          visitorKey = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `v-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          localStorage.setItem('ayush_store_visitor_key', visitorKey);
+        }
+        fetch(`${API_BASE}/api/v1/analytics/visit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Merchant-Id': gatewayConfig.merchantKey || '00000000-0000-0000-0000-000000000001' },
+          body: JSON.stringify({ visitorKey, pagePath: window.location.pathname, referrer: document.referrer })
+        }).catch(() => {});
+      } catch (error) { console.warn('Store visit could not be recorded.', error); }
+    }
+
+    document.getElementById('store-contact-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const button = document.getElementById('store-contact-submit');
+      const status = document.getElementById('store-contact-status');
+      button.disabled = true;
+      status.textContent = 'Sending…';
+      const formData = new FormData(form);
+      try {
+        const response = await fetch(`${API_BASE}/api/v1/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Merchant-Id': gatewayConfig.merchantKey || '00000000-0000-0000-0000-000000000001' },
+          body: JSON.stringify({ name: formData.get('name'), email: formData.get('email'), phone: formData.get('phone'), message: formData.get('message') })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Could not send your message.');
+        form.reset();
+        status.textContent = 'Thanks! Your message has been sent.';
+      } catch (error) {
+        status.textContent = error.message || 'Could not send your message. Please try again.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+  </script>
+</body>
+</html>

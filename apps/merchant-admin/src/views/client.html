@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10213c">
+  <title>Client Dashboard | AyuPay</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#14243e;background:#f3f6fb;font-synthesis:none}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 8% 2%,#dcecff 0,transparent 36%),#f4f7fb}.top{height:76px;background:#fff;border-bottom:1px solid #e6ebf2;padding:0 max(22px,calc((100% - 1180px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{display:flex;align-items:center;gap:11px;color:#14243e;font-weight:850;font-size:19px;letter-spacing:-.04em}.brand-mark{width:38px;height:38px;border-radius:12px;object-fit:contain;background:#fff;box-shadow:0 7px 16px #2563eb30}.brand small{display:block;font-size:11px;color:#8391a5;font-weight:650;letter-spacing:.02em;margin-top:2px}.secure-pill{font-size:11px;color:#2c648b;background:#eef8ff;border:1px solid #d8efff;border-radius:99px;padding:8px 11px;font-weight:750}.wrap{max-width:1180px;margin:32px auto;padding:0 20px}.card{background:white;border:1px solid #e1e8f1;border-radius:16px;padding:22px;box-shadow:0 8px 24px #17365d0a;margin-bottom:18px}.login-shell{max-width:980px;min-height:585px;margin:7vh auto;display:grid;grid-template-columns:1fr 1fr;background:#fff;border:1px solid #e4eaf2;border-radius:26px;overflow:hidden;box-shadow:0 28px 80px #102b4a24}.login-story{position:relative;overflow:hidden;padding:48px 42px;background:radial-gradient(circle at 14% 88%,#25c7e64a,transparent 35%),linear-gradient(145deg,#0c1d37,#123d77 65%,#0879bc);color:#fff;display:flex;flex-direction:column;justify-content:space-between}.login-story:after{content:"";position:absolute;width:310px;height:310px;border:1px solid #ffffff20;border-radius:50%;right:-140px;top:-110px;box-shadow:0 0 0 38px #ffffff08,0 0 0 76px #ffffff06}.eyebrow{font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase;color:#9fe8fa}.story-title{font-size:35px;line-height:1.12;letter-spacing:-.045em;max-width:360px;margin:16px 0}.story-copy{font-size:14px;line-height:1.75;color:#c7d8ef;max-width:350px}.story-art{position:relative;z-index:1;align-self:flex-end;width:180px;height:130px;margin:8px 5px 0 0;border-radius:26px;background:linear-gradient(145deg,#ffffff22,#ffffff09);border:1px solid #ffffff32;transform:rotate(-7deg);display:grid;place-items:center;font-size:55px;box-shadow:0 22px 42px #03132945}.story-foot{font-size:11px;color:#b6cce7;line-height:1.6;margin-top:22px}.login-form-panel{padding:48px 46px;display:flex;flex-direction:column;justify-content:center}.form-kicker{font-size:11px;color:#3975b7;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.title{font-size:28px;font-weight:850;letter-spacing:-.04em;margin:10px 0 7px;color:#13223b}.muted{color:#697b95;font-size:14px;line-height:1.6}.field{display:block;margin:18px 0 0;font-weight:750;font-size:12px;color:#34435a}.field input{display:block;width:100%;border:1px solid #d6dfeb;border-radius:11px;padding:13px 14px;margin-top:7px;font:inherit;font-size:14px;color:#172a46;background:#fbfdff;outline:none;transition:border .18s,box-shadow .18s}.field input:focus{border-color:#3198dd;box-shadow:0 0 0 4px #22a8db1a;background:#fff}.password-wrap{position:relative}.password-wrap input{padding-right:82px}.toggle-password{position:absolute;right:9px;bottom:8px;border:0;background:transparent;color:#2877b8;font-size:11px;font-weight:800;padding:7px;cursor:pointer}.primary-btn{width:100%;margin-top:22px;padding:14px 16px;border:0;border-radius:11px;background:linear-gradient(105deg,#087fc5,#2563eb);color:white;font:inherit;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 10px 20px #1c71cf2b;transition:transform .18s,box-shadow .18s}.primary-btn:hover{transform:translateY(-1px);box-shadow:0 14px 24px #1c71cf3a}.primary-btn:disabled{opacity:.65;cursor:wait;transform:none}.login-help{margin-top:15px;padding:12px 13px;background:#f4f8fc;border-radius:10px;color:#667891;font-size:11px;line-height:1.6}.login-help strong{color:#334968}.status{font-size:13px;min-height:20px;color:#b42318;margin-top:12px}.hidden{display:none!important}.btn-logout{border:0;border-radius:9px;background:#203b5e;color:#fff;font-weight:750;padding:10px 15px;cursor:pointer}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.stat-label{color:#62738c;font-size:12px;font-weight:750;text-transform:uppercase}.stat-value{font-size:25px;font-weight:850;margin-top:8px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #edf1f6;font-size:13px;vertical-align:top}th{color:#64748b;text-transform:uppercase;font-size:11px}td.message{white-space:normal;min-width:220px;max-width:420px}.tag{border-radius:99px;background:#e8f4ff;color:#165da8;padding:5px 9px;font-size:12px;font-weight:750}@media(max-width:760px){.login-shell{grid-template-columns:1fr;margin:5vh auto;max-width:500px}.login-story{padding:28px 28px 22px;min-height:220px}.story-title{font-size:26px;max-width:330px;margin:10px 0}.story-copy{font-size:12px;max-width:330px}.story-art{position:absolute;right:18px;bottom:18px;width:84px;height:74px;font-size:33px;border-radius:18px}.story-foot{max-width:230px;margin-top:12px}.login-form-panel{padding:30px 28px 34px}.title{font-size:25px}}@media(max-width:480px){.top{height:66px;padding:0 16px}.secure-pill{font-size:10px;padding:7px 9px}.wrap{margin:18px auto;padding:0 12px}.card{padding:17px}.login-shell{margin:20px auto;border-radius:20px}.login-story{min-height:205px;padding:23px 21px 18px}.story-title{font-size:23px;max-width:265px}.story-copy{max-width:250px}.story-foot{font-size:10px;max-width:205px}.login-form-panel{padding:25px 21px 28px}.title{font-size:23px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="brand"><img class="brand-mark" src="/ayupay-logo.png" alt="AyuPay logo"><span>AyuPay<small>Secure client portal</small></span></div><span class="secure-pill">🔒 PRIVATE CLIENT ACCESS</span><button id="logout" class="btn-logout hidden" type="button">Sign out</button></header>
+  <main class="wrap">
+    <section id="loginPanel" class="login-shell">
+      <aside class="login-story">
+        <div><div class="eyebrow">Your business, in view</div><h1 class="story-title">A clearer view of every payment.</h1><p class="story-copy">Check transactions, store visitors and customer messages in one private workspace built for your business.</p><div class="story-art" aria-hidden="true">↗</div></div>
+        <div class="story-foot">Your account only shows information for the client store associated with your login.</div>
+      </aside>
+      <div class="login-form-panel">
+        <div class="form-kicker">Merchant workspace</div>
+        <h2 class="title">Welcome back</h2>
+        <p class="muted">Sign in with the details shared by your store administrator.</p>
+        <form id="loginForm">
+          <label class="field">Client / store code<input id="clientCode" name="client" required autocomplete="organization" placeholder="e.g. leostays"></label>
+          <label class="field">Merchant contact email<input id="email" name="email" type="email" required autocomplete="username" placeholder="you@yourbusiness.com"></label>
+          <label class="field">Client login key <span style="font-weight:550;color:#78879a">(temporary password)</span><span class="password-wrap"><input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Enter your temporary login key"><button id="togglePassword" class="toggle-password" type="button" aria-label="Show login key">Show</button></span></label>
+          <button id="loginButton" class="primary-btn" type="submit">Sign in to dashboard <span aria-hidden="true">→</span></button>
+          <div id="loginStatus" class="status" role="status" aria-live="polite"></div>
+        </form>
+        <div class="login-help"><strong>What is my login key?</strong> It’s the one-time temporary password generated by the admin panel. Your store code is included in your invitation link; your login email is the merchant contact email.</div>
+        <p class="muted" style="font-size:11px;margin:14px 0 0">Need a new login key? Ask your store administrator to issue a new client login.</p>
+      </div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="card" style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap">
+        <div><h1 id="storeName" class="title">Client dashboard</h1><div id="storeContact" class="muted"></div></div><span id="storeVpa" class="tag">UPI not configured</span>
+      </div>
+      <div class="stats">
+        <div class="card"><div class="stat-label">Successful payments</div><div id="successfulCount" class="stat-value">0</div></div>
+        <div class="card"><div class="stat-label">Successful amount</div><div id="successfulAmount" class="stat-value">₹0.00</div></div>
+        <div class="card"><div class="stat-label">Pending payments</div><div id="pendingCount" class="stat-value">0</div></div>
+        <div class="card"><div class="stat-label">Total payments</div><div id="totalCount" class="stat-value">0</div></div>
+      </div>
+      <div class="card"><h2 class="title">Recent transactions</h2><div class="table-wrap"><table><thead><tr><th>Order</th><th>Payment</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead><tbody id="paymentsBody"></tbody></table></div></div>
+      <div class="card"><h2 class="title">Recent visitors</h2><p class="muted">Anonymous visitor keys; no IP addresses are collected.</p><div class="table-wrap"><table><thead><tr><th>Visitor</th><th>Page</th><th>Referrer</th><th>Date</th></tr></thead><tbody id="visitorsBody"></tbody></table></div></div>
+      <div class="card"><h2 class="title">Contact messages</h2><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Date</th></tr></thead><tbody id="inquiriesBody"></tbody></table></div></div>
+      <div id="dashboardStatus" class="muted" role="status"></div>
+    </section>
+  </main>
+  <script>
+    const tokenKey='ayupay_client_session';
+    const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+    const fmtDate=value=>value?new Date(value).toLocaleString():'—';
+    const fmtAmount=paise=>`₹${(Number(paise||0)/100).toFixed(2)}`;
+    const loginPanel=document.getElementById('loginPanel'), dashboard=document.getElementById('dashboard'), logoutButton=document.getElementById('logout');
+    const queryClient=new URLSearchParams(location.search).get('client')||''; document.getElementById('clientCode').value=queryClient;
+    document.getElementById('togglePassword').addEventListener('click',event=>{const input=document.getElementById('password'),show=input.type==='password';input.type=show?'text':'password';event.currentTarget.textContent=show?'Hide':'Show';event.currentTarget.setAttribute('aria-label',show?'Hide login key':'Show login key');});
+    async function loadDashboard(){
+      const token=sessionStorage.getItem(tokenKey); if(!token)return;
+      const response=await fetch('/api/v1/client/dashboard',{headers:{Authorization:`Bearer ${token}`}});
+      const data=await response.json();
+      if(!response.ok){sessionStorage.removeItem(tokenKey);loginPanel.classList.remove('hidden');dashboard.classList.add('hidden');logoutButton.classList.add('hidden');throw new Error(data.error||'Please sign in again.');}
+      loginPanel.classList.add('hidden');dashboard.classList.remove('hidden');logoutButton.classList.remove('hidden');
+      document.getElementById('storeName').textContent=`${data.merchant.businessName} Dashboard`;
+      document.getElementById('storeContact').textContent=[data.merchant.email,data.merchant.phone].filter(Boolean).join(' · ');
+      document.getElementById('storeVpa').textContent=data.merchant.upiId||'UPI not configured';
+      const summary=data.summary||{};
+      document.getElementById('successfulCount').textContent=summary.successfulPayments||0;
+      document.getElementById('successfulAmount').textContent=fmtAmount(summary.successfulAmountPaise);
+      document.getElementById('pendingCount').textContent=summary.pendingPayments||0;
+      document.getElementById('totalCount').textContent=summary.totalPayments||0;
+      const payments=data.payments||[],visits=data.visits||[],inquiries=data.inquiries||[];
+      document.getElementById('paymentsBody').innerHTML=payments.length?payments.map(p=>`<tr><td>${escapeHtml(p.orderId)}</td><td><code>${escapeHtml(p.id)}</code></td><td>${fmtAmount(p.amountPaise)}</td><td>${escapeHtml(p.method)}</td><td>${escapeHtml(p.status)}</td><td>${escapeHtml(fmtDate(p.completedAt||p.createdAt))}</td></tr>`).join(''):'<tr><td colspan="6">No transactions yet.</td></tr>';
+      document.getElementById('visitorsBody').innerHTML=visits.length?visits.map(v=>`<tr><td><code>${escapeHtml(String(v.visitorKey||'').slice(0,12))}</code></td><td>${escapeHtml(v.pagePath)}</td><td>${escapeHtml(v.referrer||'Direct')}</td><td>${escapeHtml(fmtDate(v.createdAt))}</td></tr>`).join(''):'<tr><td colspan="4">No visitor activity yet.</td></tr>';
+      document.getElementById('inquiriesBody').innerHTML=inquiries.length?inquiries.map(i=>`<tr><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.email)}</td><td>${escapeHtml(i.phone||'—')}</td><td class="message">${escapeHtml(i.message)}</td><td>${escapeHtml(fmtDate(i.createdAt))}</td></tr>`).join(''):'<tr><td colspan="5">No contact messages yet.</td></tr>';
+    }
+    document.getElementById('loginForm').addEventListener('submit',async event=>{
+      event.preventDefault();const button=document.getElementById('loginButton'),status=document.getElementById('loginStatus');button.disabled=true;status.textContent='Signing in…';
+      try{const response=await fetch('/api/v1/client/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client:document.getElementById('clientCode').value,email:document.getElementById('email').value,password:document.getElementById('password').value})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Sign in failed.');sessionStorage.setItem(tokenKey,data.token);document.getElementById('password').value='';await loadDashboard();status.textContent='';}
+      catch(error){status.textContent=error.message||'Could not sign in.';}finally{button.disabled=false;}
+    });
+    logoutButton.addEventListener('click',async()=>{const token=sessionStorage.getItem(tokenKey);try{await fetch('/api/v1/client/logout',{method:'POST',headers:{Authorization:`Bearer ${token}`}});}catch{}sessionStorage.removeItem(tokenKey);dashboard.classList.add('hidden');loginPanel.classList.remove('hidden');logoutButton.classList.add('hidden');});
+    if(sessionStorage.getItem(tokenKey))loadDashboard().catch(error=>{document.getElementById('loginStatus').textContent=error.message;});
+  </script>
+</body>
+</html>
