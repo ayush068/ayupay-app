@@ -1456,11 +1456,27 @@ export function registerAdminRoutes(server, ctx) {
     }
 
     try {
-      if (berry.getStatus() === 'DISCONNECTED') {
-        await berry.initialize();
-      } else {
-        await berry.reconnect();
-      }
+ 
+const currentStatus = berry.getStatus();
+
+console.log('[WhatsApp Admin] Current status:', currentStatus);
+
+if (currentStatus === 'CONNECTED') {
+  HttpServer.json(res, 200, {
+    success: true,
+    status: currentStatus,
+    qrCode: null,
+    message: 'WhatsApp is already connected.'
+  });
+  return;
+}
+
+if (currentStatus === 'DISCONNECTED') {
+  await berry.initialize();
+}
+
+// Do not call berry.reconnect() here.
+// Its default behavior deletes the existing session.
 
       let qr = null;
       if (typeof berry.waitForQrCode === 'function') {
