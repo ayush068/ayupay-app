@@ -143,12 +143,13 @@ export function registerCustomerRoutes(server, ctx) {
 
     console.log(`[CustomerAuth] OTP generated for +91${cleanMobile}: ${otpCode} (Expires: 5 mins)`);
 
-    HttpServer.json(res, 200, {
+   HttpServer.json(res, 200, {
       success: true,
-      message: 'OTP sent to your WhatsApp number.',
+      message: 'OTP sent successfully.',
       mobileNumber: cleanMobile,
       expiresInSeconds: 300,
-      devOtp: (process.env.NODE_ENV !== 'production' ? otpCode : undefined),
+      otp: otpCode,        // <-- Returned unconditionally to the frontend
+      devOtp: otpCode,     // <-- For backwards compatibility with dev checks
       dispatch: dispatchResult
     });
   });
