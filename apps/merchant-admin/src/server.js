@@ -20,7 +20,11 @@ if (!process.env.BASE_PAYMENT_API_URL && typeof process.loadEnvFile === 'functio
 export class AdminServer {
   constructor(options = {}) {
     this.db = options.db || getDatabase();
-    this.apiBaseUrl = options.apiBaseUrl || process.env.BASE_PAYMENT_API_URL || 'http://127.0.0.1:6100';
+    this.apiBaseUrl = options.apiBaseUrl 
+      || process.env.BASE_PAYMENT_API_URL 
+      || process.env.PAYMENT_API_URL 
+      || process.env.API_URL 
+      || 'https://ayupay-api.onrender.com';
     this.merchantRepo = new MerchantRepository(this.db);
     this.ticketRepo = new SupportTicketRepository(this.db);
     this.htmlTemplatePath = path.join(__dirname, 'views', 'admin.html');
@@ -61,7 +65,7 @@ export class AdminServer {
         res.writeHead(204, {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-merchant-id'
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-merchant-id, x-customer-token, *'
         });
         res.end();
         return;
@@ -125,7 +129,10 @@ export class AdminServer {
 
       // Transparent API Proxy: Forwards `/api/*` to the Payment Engine
       if (pathname.startsWith('/api/')) {
-        const targetUrlStr = process.env.BASE_PAYMENT_API_URL || `http://127.0.0.1:${process.env.PAYMENT_API_PORT || 6100}`;
+        const targetUrlStr = process.env.BASE_PAYMENT_API_URL 
+          || process.env.PAYMENT_API_URL 
+          || process.env.API_URL 
+          || 'https://ayupay-api.onrender.com';
         const targetUrl = new URL(targetUrlStr);
 
         const isHttps = targetUrl.protocol === 'https:';
