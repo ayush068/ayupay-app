@@ -33,7 +33,6 @@ export class AdminServer {
     } catch {}
 
     let html = this.template;
-    // Keep empty string if proxying through /api, or supply remote URL directly:
     const clientApiBase = '';
     html = html.replaceAll('{{API_BASE_URL}}', clientApiBase);
     html = html.replaceAll(
@@ -61,8 +60,8 @@ export class AdminServer {
       if (req.method === 'OPTIONS') {
         res.writeHead(204, {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-merchant-id'
         });
         res.end();
         return;
@@ -87,7 +86,7 @@ export class AdminServer {
         return;
       }
 
-      // Merged Control Center Supervisor Proxy
+      // Supervisor Proxy (Safe Fallback to avoid 502 errors when port 8090 is absent)
       if (pathname.startsWith('/api/services') || pathname === '/api/logs/stream') {
         const ccPort = Number(process.env.CONTROL_CENTER_PORT || 8090);
         const proxyReq = http.request({
@@ -104,10 +103,19 @@ export class AdminServer {
           proxyRes.pipe(res);
         });
 
-        proxyReq.on('error', (err) => {
+        proxyReq.on('error', () => {
           if (!res.headersSent) {
-            res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Control center supervisor unavailable', details: err.message }));
+            if (pathname.startsWith('/api/services')) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ services: [], running: false, mode: 'cloud_managed' }));
+            } else {
+              res.writeHead(200, {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive'
+              });
+              res.end(': connected\n\n');
+            }
           }
         });
 
@@ -115,7 +123,7 @@ export class AdminServer {
         return;
       }
 
-      // Transparent API Proxy: Supports both Localhost Port AND Remote Render HTTPS Endpoints
+      // Transparent API Proxy: Forwards `/api/*` to the Payment Engine
       if (pathname.startsWith('/api/')) {
         const targetUrlStr = process.env.BASE_PAYMENT_API_URL || `http://127.0.0.1:${process.env.PAYMENT_API_PORT || 6100}`;
         const targetUrl = new URL(targetUrlStr);
@@ -134,7 +142,7 @@ export class AdminServer {
           'x-merchant-id': req.headers['x-merchant-id'] || defaultMerchantId,
           host: targetUrl.host,
           'x-forwarded-host': req.headers.host || '',
-          'x-forwarded-proto': req.headers['x-forwarded-proto'] || 'http'
+          'x-forwarded-proto': isHttps ? 'https' : (req.headers['x-forwarded-proto'] || 'http')
         };
 
         const proxyReq = transport.request({
@@ -145,12 +153,22 @@ export class AdminServer {
           method: req.method,
           headers: forwardHeaders
         }, (proxyRes) => {
+          // If SSE stream, configure flush headers
+          if (pathname.includes('/stream')) {
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Content-Type', 'text/event-stream');
+            res.setHeader('Connection', 'keep-alive');
+          }
           res.writeHead(proxyRes.statusCode, proxyRes.headers);
           proxyRes.pipe(res);
         });
 
+        // Disable socket timeout on long-polling and SSE routes
+        proxyReq.setTimeout(0);
+
         proxyReq.on('error', (err) => {
           if (!res.headersSent) {
+            console.error('[AdminServer Proxy Error]:', err.message, '-> Target:', targetUrlStr);
             res.writeHead(502, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Gateway API unavailable', details: err.message, target: targetUrlStr }));
           }
@@ -167,13 +185,7 @@ export class AdminServer {
           path.resolve(__dirname, '../../payment-api/public/youpi-sms-gateway.apk'),
           path.resolve(__dirname, '../../android-observer-app/youpi-sms-gateway.apk')
         ];
-        let apkPath = null;
-        for (const p of apkCandidates) {
-          if (fs.existsSync(p)) {
-            apkPath = p;
-            break;
-          }
-        }
+        let apkPath = apkCandidates.find(p => fs.existsSync(p));
         if (apkPath) {
           const stat = fs.statSync(apkPath);
           res.writeHead(200, {
