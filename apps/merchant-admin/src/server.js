@@ -1,4 +1,5 @@
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,7 +8,6 @@ import { getDatabase, MerchantRepository, SupportTicketRepository } from '@youpi
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// In production, reliably ensure environment variables from .env are loaded if not already provided
 if (!process.env.BASE_PAYMENT_API_URL && typeof process.loadEnvFile === 'function') {
   try {
     const rootEnv = path.resolve(__dirname, '../../../.env');
@@ -18,15 +18,9 @@ if (!process.env.BASE_PAYMENT_API_URL && typeof process.loadEnvFile === 'functio
 }
 
 export class AdminServer {
-  /**
-   * @param {{
-   *   db?: import('@youpi/db').Database,
-   *   apiBaseUrl?: string
-   * }} options
-   */
   constructor(options = {}) {
     this.db = options.db || getDatabase();
-    this.apiBaseUrl = options.apiBaseUrl || process.env.BASE_PAYMENT_API_URL || 'http://localhost:6100';
+    this.apiBaseUrl = options.apiBaseUrl || process.env.BASE_PAYMENT_API_URL || 'http://127.0.0.1:6100';
     this.merchantRepo = new MerchantRepository(this.db);
     this.ticketRepo = new SupportTicketRepository(this.db);
     this.htmlTemplatePath = path.join(__dirname, 'views', 'admin.html');
@@ -39,11 +33,13 @@ export class AdminServer {
     } catch {}
 
     let html = this.template;
-    // Always use empty string '' so client fetch calls hit the merchant admin's own /api proxy!
-    // This completely eliminates CORS errors, tunnel downtime 530s, and cross-origin failures.
+    // Keep empty string if proxying through /api, or supply remote URL directly:
     const clientApiBase = '';
     html = html.replaceAll('{{API_BASE_URL}}', clientApiBase);
-    html = html.replaceAll('{{ANDROID_ENROLLMENT_SECRET}}', process.env.ANDROID_ENROLLMENT_SECRET || 'android_pairing_enrollment_secret_key_32_chars');
+    html = html.replaceAll(
+      '{{ANDROID_ENROLLMENT_SECRET}}',
+      process.env.ANDROID_ENROLLMENT_SECRET || 'android_pairing_enrollment_secret_key_32_chars'
+    );
     return html;
   }
 
@@ -52,7 +48,6 @@ export class AdminServer {
       const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
       const pathname = url.pathname;
 
-      // Shared AyuPay brand asset for the admin and client portals.
       if (pathname === '/ayupay-logo.png' && (req.method === 'GET' || req.method === 'HEAD')) {
         const logoPath = path.resolve(__dirname, '../public/ayupay-logo.png');
         if (fs.existsSync(logoPath)) {
@@ -73,14 +68,12 @@ export class AdminServer {
         return;
       }
 
-      // Health
       if (pathname === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'UP', service: 'merchant-admin' }));
         return;
       }
 
-      // Admin Tickets API: GET /api/admin/tickets
       if (pathname === '/api/admin/tickets') {
         const merchants = this.merchantRepo.findAll();
         const mId = merchants[0]?.id || '00000000-0000-0000-0000-000000000001';
@@ -94,7 +87,7 @@ export class AdminServer {
         return;
       }
 
-      // Merged Control Center Supervisor Proxy: /api/services/* and /api/logs/stream -> Control Center on port 8090
+      // Merged Control Center Supervisor Proxy
       if (pathname.startsWith('/api/services') || pathname === '/api/logs/stream') {
         const ccPort = Number(process.env.CONTROL_CENTER_PORT || 8090);
         const proxyReq = http.request({
@@ -118,28 +111,39 @@ export class AdminServer {
           }
         });
 
-        req.on('data', chunk => proxyReq.write(chunk));
-        req.on('end', () => proxyReq.end());
+        req.pipe(proxyReq);
         return;
       }
 
-      // Transparent API Proxy: /api/* -> Payment Core REST API
+      // Transparent API Proxy: Supports both Localhost Port AND Remote Render HTTPS Endpoints
       if (pathname.startsWith('/api/')) {
-        const targetPort = Number(process.env.PAYMENT_API_PORT || 6100);
-        const defaultMerchant = this.merchantRepo.getDefault ? this.merchantRepo.getDefault() : (this.merchantRepo.findById('00000000-0000-0000-0000-000000000001') || this.merchantRepo.findAll()[0]);
+        const targetUrlStr = process.env.BASE_PAYMENT_API_URL || `http://127.0.0.1:${process.env.PAYMENT_API_PORT || 6100}`;
+        const targetUrl = new URL(targetUrlStr);
+
+        const isHttps = targetUrl.protocol === 'https:';
+        const transport = isHttps ? https : http;
+        const targetPort = targetUrl.port || (isHttps ? 443 : 80);
+
+        const defaultMerchant = this.merchantRepo.getDefault
+          ? this.merchantRepo.getDefault()
+          : (this.merchantRepo.findById('00000000-0000-0000-0000-000000000001') || this.merchantRepo.findAll()[0]);
         const defaultMerchantId = defaultMerchant?.id || '00000000-0000-0000-0000-000000000001';
-        const proxyReq = http.request({
-          hostname: '127.0.0.1',
+
+        const forwardHeaders = {
+          ...req.headers,
+          'x-merchant-id': req.headers['x-merchant-id'] || defaultMerchantId,
+          host: targetUrl.host,
+          'x-forwarded-host': req.headers.host || '',
+          'x-forwarded-proto': req.headers['x-forwarded-proto'] || 'http'
+        };
+
+        const proxyReq = transport.request({
+          protocol: targetUrl.protocol,
+          hostname: targetUrl.hostname,
           port: targetPort,
           path: req.url,
           method: req.method,
-          headers: {
-            ...req.headers,
-            'x-merchant-id': req.headers['x-merchant-id'] || defaultMerchantId,
-            host: `localhost:${targetPort}`,
-            'x-forwarded-host': req.headers.host || '',
-            'x-forwarded-proto': req.headers['x-forwarded-proto'] || 'http'
-          }
+          headers: forwardHeaders
         }, (proxyRes) => {
           res.writeHead(proxyRes.statusCode, proxyRes.headers);
           proxyRes.pipe(res);
@@ -148,7 +152,7 @@ export class AdminServer {
         proxyReq.on('error', (err) => {
           if (!res.headersSent) {
             res.writeHead(502, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Gateway API unavailable', details: err.message }));
+            res.end(JSON.stringify({ error: 'Gateway API unavailable', details: err.message, target: targetUrlStr }));
           }
         });
 
@@ -195,7 +199,7 @@ export class AdminServer {
         return;
       }
 
-      // Isolated authenticated merchant client portal.
+      // Isolated authenticated merchant client portal
       if (pathname === '/client' || pathname === '/client/') {
         const clientHtml = fs.readFileSync(path.join(__dirname, 'views', 'client.html'), 'utf8');
         res.writeHead(200, {
